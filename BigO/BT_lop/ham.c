@@ -79,7 +79,7 @@ void insertArray(int arr[], int *n, int value, int index)
     (*n)++;
 }
 
-void deleteArray(int arr[], int *n, int value, int index)
+void deleteArray(int arr[], int *n, int index)
 {
     if (index < 0 || index > *n)
     {
