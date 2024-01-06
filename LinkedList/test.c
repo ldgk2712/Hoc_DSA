@@ -59,7 +59,6 @@ void f(int a[], int *n) {
 int main() {
     int a[] = {1, 9, 7, 5, 2, 4};
     int n = 6;
-    int swaps = 0, inserts = 0;
     printf("Before: ");
     printArray(a, n);
     f(a, &n);
