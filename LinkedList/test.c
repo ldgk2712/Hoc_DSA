@@ -19,8 +19,7 @@ void printArray(int a[], int n) {
     printf("\n");
 }
 
-void f(int a[], int *n, int *swaps, int *inserts) {
-    *swaps = 0, *inserts = 0;
+void f(int a[], int *n) {
     int min = 0;
     int j;
     for (int i = 0; i < (*n); i++) {
@@ -34,10 +33,8 @@ void f(int a[], int *n, int *swaps, int *inserts) {
             }
 
             if (a[min] % 2 == 0) {
-                (*swaps)++;
                 swap(&a[i], &a[min]);
             } else {
-                (*inserts)++;
                 insertZero(a, n, i);
             }
         } else {
@@ -49,10 +46,8 @@ void f(int a[], int *n, int *swaps, int *inserts) {
             }
 
             if (a[min] % 2 != 0) {
-                (*swaps)++;
                 swap(&a[i], &a[min]);
             } else {
-                (*inserts)++;
                 insertZero(a, n, i);
             }
         }
@@ -67,10 +62,8 @@ int main() {
     int swaps = 0, inserts = 0;
     printf("Before: ");
     printArray(a, n);
-    f(a, &n, &swaps, &inserts);
+    f(a, &n);
     printf("After: ");
     printArray(a, n);
-    printf("Swaps: %d\n", swaps);
-    printf("Inserts: %d\n", inserts);
     return 0;
 }
