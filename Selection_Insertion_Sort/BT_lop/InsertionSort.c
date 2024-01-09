@@ -28,7 +28,6 @@ void insertionSort(int arr[], int n, int *comps, int *shifts)
         }
         arr[j+1] = key;
     }
-
 }
 
 

@@ -1,22 +1,23 @@
 #include <stdio.h>
+#include <stdlib.h>
 
-#include <stdio.h>
 #define MAX 5
 
-typedef struct {
-    int head, tail;
+typedef struct Queue
+{
+    int tail, head;
     int a[MAX];
 } Queue;
 
 void init(Queue *q)
 {
-    q->head = 0;
     q->tail = -1;
+    q->head = 0;
 }
 
 int isFull(Queue *q)
 {
-    return (q->tail - q->head + 1) == MAX;
+    return q->tail == MAX-1;
 }
 
 int isEmpty(Queue *q)
@@ -30,7 +31,7 @@ void put(Queue *q, int value)
     {
         return;
     }
-    q->a[++(q->tail)] = value;
+    q->a[++q->tail] = value;
 }
 
 int get(Queue *q)
@@ -44,11 +45,6 @@ int get(Queue *q)
 
 void displayQueue(Queue *q)
 {
-    if (isEmpty(q))
-    {
-        printf("Queue is empty.\n");
-        return;
-    }
     for (int i = q->head; i <= q->tail; i++)
     {
         printf("%d ",q->a[i]);
@@ -56,35 +52,40 @@ void displayQueue(Queue *q)
     printf("\n");
 }
 
-int main() {
+int main()
+{
     Queue q;
     init(&q);
     int num[6] = {1,-2,3,-4,5,-6};
-    // push
+
     printf("MAX = %d\n\n", MAX);
-    printf("PUT\n");
-    for (int i = 0; i < 6; i++){
-        printf("put %d: \n",num[i]);
-        if(!isFull(&q)){
+    printf("PUSH\n");
+
+    for (int i = 0; i < 6; i++)
+    {
+        printf("put %d:\n",num[i]);
+        if (!isFull(&q))
+        {
             put(&q,num[i]);
             displayQueue(&q);
-            printf("\n");
         }
         else
-            printf("Queue is full. \n\n");
+        {
+            printf("Queue is full.\n");
+        }
     }
-    // get
-    printf("GET\n");
-    int i = 0;
-    while (!isEmpty(&q)) {
-        printf("get %d: %d\n",i, get(&q));
-        displayQueue(&q);
-        i++;
-        printf("\n");
-     }
+    printf("\nGET\n");
+    while (!isEmpty(&q))
+    {
+        printf("get %d:\n",get(&q));
+        if (!isEmpty(&q))
+        {
+            displayQueue(&q);
+        }
+        else
+        {
+            printf("Queue is empty.\n");
+        }
+    }
     return 0;
 }
-
-
-
-
