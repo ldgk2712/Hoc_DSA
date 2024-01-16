@@ -77,7 +77,7 @@ void deleteTail(LinkedList *list)
     Node *pre = NULL;
     while (cur->next != NULL)
     {
-        pre->next = cur;
+        pre = cur;
         cur = cur->next;
     }
     if (pre == NULL)
