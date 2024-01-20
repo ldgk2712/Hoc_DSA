@@ -1,142 +1,246 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-typedef struct NodeType {
+// Định nghĩa về TreeNode
+typedef struct NodeType
+{
     int data;
-    struct NodeType* left;
-    struct NodeType* right;
+    struct NodeType *left, *right;
 } TreeNode;
 
-typedef struct BinaryTreeType {
-    struct NodeType* root;
+// Định nghĩa về BinaryTree
+typedef struct BinaryTreeType
+{
+    struct NodeType *root;
 } BinaryTree;
 
-TreeNode* makeNode(int data) {
-    TreeNode* newNode = (TreeNode*)malloc(sizeof(TreeNode));
+// Tạo TreeNode mới
+TreeNode *makeNode(int data)
+{
+    TreeNode *newNode = (TreeNode*)malloc(sizeof(TreeNode));
     newNode->data = data;
-    newNode->left = NULL;
-    newNode->right = NULL;
+    newNode->left = newNode->right = NULL;
     return newNode;
 }
 
-void print(TreeNode* node) {
-    if (node != NULL) {
-        printf("%d ", node->data);
+// In cây theo thứ tự giữa - trái - phải
+void print(TreeNode *node)
+{
+    if (node != NULL)
+    {
+        printf("%d ",node->data);
         print(node->left);
         print(node->right);
     }
 }
 
-void init(BinaryTree* tree) {
+// Khởi tạo BinaryTree
+void init(BinaryTree *tree)
+{
     tree->root = NULL;
 }
 
-void insert(TreeNode** node, int data) {
-    if (*node == NULL) {
-        *node = makeNode(data);
-    } else {
-        if (data < (*node)->data) {
-            insert(&(*node)->left, data);
-        } else {
-            insert(&(*node)->right, data);
+// Chèn node mới vào cây
+void insert(BinaryTree *tree, int data)
+{
+    TreeNode *node = makeNode(data);
+
+    if (tree->root == NULL)
+    {
+        tree->root = node;
+    }
+    else
+    {
+        TreeNode *current = tree->root;
+        TreeNode *parent = NULL;
+        
+        while (current != NULL)
+        {
+            parent = current;
+            if (data < current->data)
+            {
+                current = current->left;
+            }
+            else
+            {
+                current = current->right;
+            }
+        }
+
+        if (data < parent->data)
+        {
+            parent->left = node;
+        }
+        else
+        {
+            parent->right = node;
         }
     }
 }
 
-TreeNode* search(TreeNode* node, int val) {
-    if (node == NULL || node->data == val) {
+// Tìm giá trị val trong cây
+TreeNode *search(TreeNode *node, int val)
+{
+    if (node == NULL || node->data == val)
+    {
         return node;
     }
-    if (val < node->data) {
+    if (val < node->data)
+    {
         return search(node->left, val);
     }
     return search(node->right, val);
 }
 
-void delete(BinaryTree* tree, int val) {
-    TreeNode* curr = tree->root; // Current node
-    TreeNode* prev = NULL;       // Previous node
 
-    // Find the node to delete
-    while (curr != NULL && curr->data != val) {
+//  Hàm xử lí one child
+void handleOneChild(BinaryTree *tree, TreeNode *curr, TreeNode *prev, int val, TreeNode *child)
+{
+    if (prev == NULL)
+    {
+        printf("\nDelete at root\n");
+        tree->root = child;
+    }
+    else
+    {
+        if (prev->data > val)
+        {
+            prev->left = child;
+        }
+        else
+        {
+            prev->right = child;
+        }
+    }
+    free(curr);
+}
+
+// Kiểm tra node là leaf
+int isLeaf(TreeNode *node)
+{
+    return (node != NULL && node->left == NULL && node->right == NULL);
+}
+
+// Hàm xử lí khi có 2 children(leafs)
+void handleTwoChildrenLeafs(BinaryTree *tree, TreeNode *curr)
+{
+    curr->data = curr->right->data;
+    free(curr->right);
+    curr->right = NULL;
+} 
+
+// Hàm xử lí khi curr->right is not a leaf
+void handleRightNotLeaf(BinaryTree *tree, TreeNode *curr)
+{
+    TreeNode *leftMost = curr->right;
+    TreeNode *parent = NULL;
+
+    while (!isLeaf(leftMost))
+    {
+        parent = leftMost;
+        leftMost = leftMost->left;
+    }
+
+    printf("Leaf data %d\n",leftMost->data);
+    curr->data = leftMost->data;
+    free(leftMost);
+    parent->left = NULL;
+}
+
+// Hàm xóa val khỏi cây nếu có
+void delete(BinaryTree *tree, int val)
+{
+    TreeNode *curr = tree->root;
+    TreeNode *prev = NULL;
+
+    while (curr != NULL)
+    {
+        if (curr->data == val) // Found
+        {
+            // Case 1: No chill / leaf
+            if (curr->left == NULL && curr->right == NULL)
+            {
+                free(curr);
+                if (prev == NULL)
+                {
+                    tree->root = NULL;
+                }
+                else
+                {
+                    if (val < prev->data)
+                    {
+                        prev->left = NULL;
+                    }
+                    else
+                    {
+                        prev->right = NULL;
+                    }
+                }
+                return;
+            }
+
+            // Case 2: One child
+            if (curr->left == NULL)
+            {
+                handleOneChild(tree, curr, prev, val, curr->right);
+                return;
+            }
+            if (curr->right == NULL) 
+            {
+                handleOneChild(tree, curr, prev, val, curr->left);
+                return;
+            }
+
+            // Case 3: 2 children (leafs)
+            if (isLeaf(curr->left) && isLeaf(curr->right))
+            {
+                handleTwoChildrenLeafs(tree, curr);
+                return;
+            }
+
+            // Case 4: curr->right is not leaf
+            if (!isLeaf(curr->right))
+            {
+                handleRightNotLeaf(tree, curr);
+                return;
+            }
+        }
+
         prev = curr;
-        if (val < curr->data) {
+        if (val < curr->data)
+        {
             curr = curr->left;
-        } else {
+        }
+        else
+        {
             curr = curr->right;
         }
     }
-
-    // Case 1: Value not found
-    if (curr == NULL) {
-        printf("Value %d not found in the binary tree.\n", val);
-        return;
-    }
-
-    // Case 2: No child / leaf
-    if (curr->left == NULL && curr->right == NULL) {
-        if (prev == NULL) {
-            // The root is the only node in the tree
-            tree->root = NULL;
-        } else if (prev->left == curr) {
-            prev->left = NULL;
-        } else {
-            prev->right = NULL;
-        }
-        free(curr);
-        return;
-    }
-
-    // Case 3: One child
-    if (curr->left == NULL || curr->right == NULL) {
-        TreeNode* child;
-        if (curr->left != NULL) {
-            child = curr->left;
-        } else {
-            child = curr->right;
-        }
-        if (prev == NULL) {
-            // Deleting the root node with one child
-            tree->root = child;
-        } else if (prev->left == curr) {
-            prev->left = child;
-        } else {
-            prev->right = child;
-        }
-        free(curr);
-        return;
-    }
-
-    // Case 4: Two children (leafs)
-    TreeNode* successor = curr->right;
-    TreeNode* successorParent = curr;
-    while (successor->left != NULL) {
-        successorParent = successor;
-        successor = successor->left;
-    }
-    curr->data = successor->data;
-    if (successorParent->left == successor) {
-        successorParent->left = successor->right;
-    } else {
-        successorParent->right = successor->right;
-    }
-    free(successor);
     return;
-
-    // Case 5: curr->right is not a leaf
-    // (Not implemented in this code snippet)
 }
 
-int main() {
+int main()
+{
+    int arr[] = {50, 25, 75, 10, 33, 56, 89, 4, 11, 40, 52, 61, 82, 95};
+    int n = sizeof(arr)/sizeof(arr[0]);
     BinaryTree tree;
     init(&tree);
 
-    int arr[] = {50, 25, 75, 10, 33, 56, 89, 4 ,11, 40 ,52, 61, 82 ,95};
-    int n = sizeof(arr)/sizeof(arr[0]);
+    // Nhập giá trị cho cây
     for (int i = 0; i < n; i++)
     {
-        insert(&tree.root,arr[i]);
+        insert(&tree, arr[i]);
     }
-    print(&tree);
+
+    // In cây
+    printf("Binary Tree: ");
+    print(tree.root);
+    printf("\n");
+
+    int val = 75;
+    delete(&tree, val);
+    printf("After deleted %d: ",val);
+    print(tree.root);
+
     return 0;
 }
