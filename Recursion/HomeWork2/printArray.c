@@ -2,13 +2,13 @@
 
 void print(int a[], int n)
 {
-    if (n == 0)
+    if (n == 1)
     {
-        printf("%d ",a[0]);
+        printf("%d ", a[0]);
         return;
     }
     print(a, n-1);
-    printf("%d ",a[n]);
+    printf("%d ", a[n-1]);
 }
 
 int main()
