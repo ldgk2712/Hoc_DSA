@@ -325,20 +325,36 @@ int findMaxBranchSum(TreeNode* root) {
 }
 
 // Hàm xóa số nguyên lẻ trên cây nhị phân
-void deleteOddNumbers(TreeNode* root) {
-    if (root == NULL)
+void XoaNodeLeTruRoot(BinaryTree* tree, TreeNode* node, TreeNode* prev, int root) {
+    // Nếu node là NULL, kết thúc đệ quy
+    if (node == NULL) {
         return;
-
-    // Xóa tất cả số lẻ trừ root
-    if (root->left != NULL && root->left->data % 2 == 1) {
-        TreeNode* temp = root->left;
-        deleteOddNumbers(root->left->left);
-        free(temp);
-    } else {
-        deleteOddNumbers(root->left);
     }
+    // Nếu node có giá trị lẻ và khác với giá trị của root
+    if (node->data % 2 != 0 && node->data != root) {
+        delete(tree, node->data); // xóa node đó
+        node = prev; // Đặt con trỏ node về node cha để tránh xử lý node này một lần nữa
+    }
+    prev = node; // Cập nhật node cha cho lần đệ quy tiếp theo
+    XoaNodeLeTruRoot(tree, node->left,prev,root); // Đệ quy qua nhánh trái
+    XoaNodeLeTruRoot(tree, node->right,prev,root); // Đệ quy qua nhánh phải
+}
 
-    deleteOddNumbers(root->right);
+// Check là các node chỉ có 1 node con
+int isNodeOneChild(TreeNode* node) {
+    return ((node->left == NULL && node->right != NULL) || (node->right == NULL && node->left != NULL));
+}
+
+// Tổng các node chỉ có 1 node con
+void sumNodeOneChild(TreeNode* node, int* sum) {
+    if (node == NULL) {
+        return ;
+    }
+    if (isNodeOneChild(node)) {
+        *sum += node->data;
+    }
+    sumNodeOneChild(node->left, sum);
+    sumNodeOneChild(node->right, sum);
 }
 
 
@@ -361,7 +377,7 @@ int main()
     printf("\n");
 
     // Delete nodes with odd values
-    deleteOddNumbers(tree.root);
+    XoaNodeLeTruRoot(&tree, tree.root, NULL, tree.root->data);
 
     // Print the modified tree
     printf("Modified Binary Tree: ");
