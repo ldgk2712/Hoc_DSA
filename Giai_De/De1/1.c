@@ -14,9 +14,9 @@ float S(int n)
 //     return 1;
 // B2: Ket qua cua BASE CASE: S(1) = 1;
 // B3: Truoc BASE CASE: n = 2
-// S(2) = S(1) + 1/3 = 1 + 1/3
+// S(2) = S(1) + 1/3 = 1 + 1/3 = 1,333333
 // B4: Truoc case B3: n = 3
-// S(3) = S(2) + 1/5 = S(1) + 1/3 + 1/5 = 1 + 1/3 + 1/5
+// S(3) = S(2) + 1/5 = S(1) + 1/3 + 1/5 = 1 + 1/3 + 1/5 = 1,533333
 
 float S1(int n)
 {
